@@ -6,6 +6,10 @@ import BufferLoader from './buffer';
 import Fab from '@material-ui/core/Fab';
 import MusicNote from '@material-ui/icons/MusicNote.js';
 import Stop from '@material-ui/icons/Stop';
+import Close from '@material-ui/icons/Close';
+import IconButton from '@material-ui/core/IconButton';
+
+import Logo from "./accompami.png";
 
 class Main extends React.Component {
   constructor(props) {
@@ -14,7 +18,9 @@ class Main extends React.Component {
       record: false,
       recordings: [],
       context: '',
-      bufferLoader: ''
+      bufferLoader: '',
+      visible: false,
+      loaded: false
     }
 
   }
@@ -36,7 +42,8 @@ class Main extends React.Component {
 
   startRecording = () => {
     this.setState({
-      record: true
+      record: true,
+      visible: true
     });
   }
 
@@ -62,9 +69,31 @@ class Main extends React.Component {
     // bufferLoader.load();
     this.setState({
       recordings: recordings,
+      visible: false
       //bufferLoader: bufferLoader
     });
 
+  }
+
+  deleteTrack = (i) => {
+    let recordings = [...this.state.recordings]; // make a separate copy of the array
+    //let i = recordings.indexOf(e.target.value);
+    if (i !== -1) {
+      recordings.splice(i, 1);
+    }
+    this.setState({
+      recordings: recordings
+    });
+  }
+
+  getFile = (e) => {
+    let sound = document.getElementById('sound');
+    sound.src = URL.createObjectURL(e.target.files[0]);
+    sound.style.visibility = 'visible';
+  }
+
+  share = () => {
+    // to do
   }
 
   // finishedLoading(bufferList) {
@@ -84,32 +113,42 @@ class Main extends React.Component {
 
   render() {
     let { record, recordings } = this.state;
-    let button = record == false ? (<Fab onClick={this.startRecording} color="primary" >
-          <MusicNote />
+    let button = record == false ? (<Fab onClick={this.startRecording} style={{width:200, height:
+    200, margin: 20}} color="primary" >
+          <MusicNote style={{width:150, height:150}}/>
     </Fab>) ://<Button onClick={this.startRecording} color="primary">Start</Button> :
       //<Button onClick={this.stopRecording} color="secondary">Stop</Button>;
-      (<Fab color="secondary" onClick={this.stopRecording}>
-            <Stop />
+      (<Fab color="secondary" onClick={this.stopRecording} style={{width:200, height:
+      200, margin: 20}}>
+            <Stop style={{width:150, height:150}}/>
       </Fab>);
-    let tracks = recordings.map(recording => {
-      return <div><audio ref={React.createRef()} src={recording.blobURL} controls autoPlay loop/></div>;
+    let tracks = recordings.map((recording, i) => {
+      return <div style={{verticalAlign: 'middle', display: 'flex', justifyContent: 'center', marginBottom: 10}}><audio ref={React.createRef()} src={recording.blobURL} controls autoPlay loop/>
+        <IconButton color="secondary" onClick={() => this.deleteTrack(i)} >
+          <Close />
+        </IconButton>
+      </div>;
     });
 
 
     return (
       <div>
-        <Typography variant="h3" gutterBottom>
-          Accomp-ami
-        </Typography>
-        <ReactMic
+        <img src={require('./cover_trans.png')} style={{height:100}}/>
+        <div>
+        {this.state.visible && <ReactMic
           record={this.state.record}
-          className="sound-wave"
+          className="mic"
           onStop={this.onStop}
           onData={this.onData}
           strokeColor="#000000"
-          backgroundColor="#FF4081" />
+          backgroundColor="#FF4081" />}
+        </div>
         <div>{button}</div>
         {tracks}
+        <Button color="primary" variant="contained" style={{position: 'absolute', bottom: 0, left: 0}} onClick={(e) => this.myInput.click()}>Load</Button>
+        <audio id="sound" controls style={{visibility: 'hidden', position: 'absolute', bottom: 0, left: 80, height: 36}}/>
+        <Button color="primary" variant="contained" style={{position: 'absolute', bottom: 0, right: 0}} onClick={this.share}>Share</Button>
+        <input id="myInput" type="file" ref={(ref) => this.myInput = ref} style={{ display: 'none' }} onChange={this.getFile}/>
       </div>
     );
   }
