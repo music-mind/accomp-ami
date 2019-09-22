@@ -144,7 +144,7 @@ class Main extends React.Component {
           backgroundColor="#FF4081" />}
         </div>
         <div>{button}</div>
-        {tracks}
+        <div className="scroll" style={{overflowY: 'auto', width: 'fit-content', height: 200, marginLeft: 'auto', marginRight: 'auto'}}>{tracks}</div>
         <Button color="primary" variant="contained" style={{position: 'absolute', bottom: 0, left: 0}} onClick={(e) => this.myInput.click()}>Load</Button>
         <audio id="sound" controls style={{visibility: 'hidden', position: 'absolute', bottom: 0, left: 80, height: 36}}/>
         <Button color="primary" variant="contained" style={{position: 'absolute', bottom: 0, right: 0}} onClick={this.share}>Share</Button>
